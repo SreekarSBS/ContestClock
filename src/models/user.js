@@ -27,7 +27,7 @@ const userSchema = mongoose.Schema({
     },
     savedContests: [
         {
-        type : [mongoose.Schema.Types.ObjectId],
+        type : mongoose.Schema.Types.ObjectId,
         ref : "Contest"
         }
 ]

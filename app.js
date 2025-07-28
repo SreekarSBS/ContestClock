@@ -4,6 +4,7 @@ const contestRouter = require("./src/routes/contests")
 const userRouter = require("./src/routes/user")
 const app = express()
 require("dotenv").config()
+require("./src/utils/cronjob")
 
 app.use("/",contestRouter)
 app.use("/",userRouter)

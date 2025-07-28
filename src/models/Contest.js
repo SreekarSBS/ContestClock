@@ -40,7 +40,10 @@ const contestSchema = new mongoose.Schema({
     },
 
     contestUrl : {
-        type : String
+        type : String,
+        validate(value)  {
+            if(!validator.isURL(value)) throw new Error("Invalid Contest URL")
+        }
     },
     platform : {
         type : String,
