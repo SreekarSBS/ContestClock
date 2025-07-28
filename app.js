@@ -1,8 +1,15 @@
 const express = require("express")
+const cors = require("cors")
 const ConnectDB = require("./src/config/database")
 const contestRouter = require("./src/routes/contests")
 const userRouter = require("./src/routes/user")
+
 const app = express()
+
+app.use(cors({
+    origin : "http://localhost:5173",
+    credentials : true
+}))
 require("dotenv").config()
 require("./src/utils/cronjob")
 
