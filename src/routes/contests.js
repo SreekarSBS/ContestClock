@@ -46,20 +46,25 @@ contestRouter.get("/contests/platform/:platform",async(req,res) => {
 
 contestRouter.get("/contests/day/:date",async(req,res) => {
     try{
+      
     const {date} = req.params;
+    const dateOnly = new Date(date);
     const {platform}  = req.query;
 
-    if(!date || isNaN(new Date(date))) throw new Error("Invalid Date , Please Correct your URL")
-    const startDate = new Date(`${date}T00:00:00.000Z`);
-    const endDate = new Date(`${date}T23:59:59.999Z`);
+    if(!date || isNaN(new Date(dateOnly.getTime()))) throw new Error("Invalid Date , Please Correct your URL")
+        const startDate = new Date(dateOnly);
+    startDate.setHours(0, 0, 0, 0);
+    
+    const endDate = new Date(dateOnly);
+    endDate.setHours(23, 59, 59, 999);
     
         
 
-         
-        if(platform && platform !== "all") contestsFromDB = await Contest.find({ $and :[{contestStartDate :{ $gte : startDate, $lte : endDate}} ,{platform : platform} ]})
+         let contestsFromDB;
+        if(platform && platform !== "all")  contestsFromDB = await Contest.find({ $and :[{ contestStartDate :{ $gte : startDate, $lte : endDate}} ,{platform : platform} ]})
             else contestsFromDB = await Contest.find({contestStartDate :{ $gte : startDate, $lte : endDate}})
          
-    
+         
             res.json({
                 message : "Contests Fetched Successfully for the Date " + date,
                 data : contestsFromDB 
@@ -71,6 +76,8 @@ contestRouter.get("/contests/day/:date",async(req,res) => {
        
 
 })
+
+
 
 module.exports = contestRouter
 

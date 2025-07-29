@@ -39,6 +39,7 @@ userRouter.get("/user",userAuth,async(req,res) => {
         res.status(401).send("Failed to fetch the user : " + err)
     }
 })
+const CONTEST_DATA = "contestCode contestDuration contestEndDate contestName contestRegistrationEndDate contestRegistrationStartDate contestSlug contestStartDate contestType contestUrl platform"
 
 userRouter.post("/user/saveContests/:contestId",userAuth,async(req,res) => {
     try{
@@ -51,13 +52,14 @@ userRouter.post("/user/saveContests/:contestId",userAuth,async(req,res) => {
         const {contestId} = req.params
         
         const contestDocument = await Contest.findById(contestId)
+        
         if(!contestDocument) throw new Error("Contest not found")
         console.log(contestDocument);
         
         const savedUser = await User.findOneAndUpdate({uid : uid},{
             $addToSet : { savedContests : contestId }
-        },{new : true}) 
-     
+        },{new : true}).populate("savedContests",CONTEST_DATA)
+        
         
         if(!savedUser || savedUser == {}) throw new Error("Please add the authorised User in DB")
         
