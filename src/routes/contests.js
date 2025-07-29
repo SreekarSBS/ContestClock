@@ -2,6 +2,7 @@ const express = require("express")
 const userAuth = require("../middlewares/auth")
 const Contest = require("../models/Contest")
 const contestsFromApi = require("../utils/contestsFromApi")
+const  mongoose = require("mongoose")
 const contestRouter = express.Router()
 
 contestRouter.get("/contests/platform/:platform",async(req,res) => {
@@ -17,8 +18,8 @@ contestRouter.get("/contests/platform/:platform",async(req,res) => {
         let contestsFromDB ;
         
         
-        if(platform !== "all") contestsFromDB = await Contest.find({platform : platform})
-        else contestsFromDB = await Contest.find({})
+        if(platform !== "all") contestsFromDB = await Contest.find({platform : platform}).sort({contestStartDate : 1})
+        else contestsFromDB = await Contest.find({}).sort({contestStartDate : 1})
 
         if(startDate) {
             const start = new Date(startDate)
@@ -30,7 +31,7 @@ contestRouter.get("/contests/platform/:platform",async(req,res) => {
         }
 
         // Sorted the contests
-        contestsFromDB.sort((a, b) => new Date(a.contestStartDate) - new Date(b.contestStartDate));
+        //  contestsFromDB.sort((a, b) => new Date(a.contestStartDate) - new Date(b.contestStartDate));
 
     
         res.json({
@@ -41,6 +42,32 @@ contestRouter.get("/contests/platform/:platform",async(req,res) => {
 
     }catch(err){
         res.status(401).send("Failed to fetch the contests : " + err)
+    }
+})
+
+contestRouter.get("/get-upcoming-contests/:platform",async(req,res) => {
+    try {
+        const {platform} = req.params
+    const response = await fetch("https://node.codolio.com/api/contest-calendar/v1/all/get-upcoming-contests")
+    const responseJSON = await response.json()
+    
+    for(const contest of responseJSON.data){
+        const {contestCode} = contest
+        await Contest.findOneAndUpdate({contestCode},contest,{upsert : true,new : true})
+    }
+    let contestsFromDB;
+    if(platform !== "all") contestsFromDB = await Contest.find({platform : platform}).sort({contestStartDate :1})
+        else contestsFromDB = await Contest.find({}).sort({contestStartDate :1})
+
+        res.json({
+            message : "🚀Upcoming Contests Fetched Successfully",
+            data : contestsFromDB
+        })
+
+    }
+
+    catch(err){
+        res.status(401).send("Failed to fetch the upcoming contests : "+ err)
     }
 })
 

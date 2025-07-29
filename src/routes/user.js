@@ -57,20 +57,38 @@ userRouter.post("/user/saveContests/:contestId",userAuth,async(req,res) => {
         console.log(contestDocument);
         
         const savedUser = await User.findOneAndUpdate({uid : uid},{
-            $addToSet : { savedContests : contestId }
-        },{new : true}).populate("savedContests",CONTEST_DATA)
+            $addToSet : { savedContests : contestDocument._id }
+        }).populate("savedContests",CONTEST_DATA)
         
         
         if(!savedUser || savedUser == {}) throw new Error("Please add the authorised User in DB")
         
-       
-
         res.json({
             message : "🚀Contest saved Successfully for " + savedUser.name,
             data : savedUser
         })
     }
     catch(err){
+        res.status(401).send(err)
+    }
+})
+
+userRouter.get("/user/registeredContests",userAuth,async(req,res) => {
+    try{
+        const {uid} = req.user
+        console.log(uid);
+        
+        
+        if(!uid || !req.user) throw new Error("Login to Continue")
+        
+        const contestData = await User.findOne({uid :uid}).populate("savedContests",CONTEST_DATA)
+        console.log(contestData);
+        
+        res.json({
+            message : "🚀Contest saved Successfully for " + req.user.name,
+            data : contestData
+        })
+    }catch(err){
         res.status(401).send(err)
     }
 })

@@ -1,3 +1,4 @@
+const  mongoose = require("mongoose");
 const Contest = require("../models/Contest")
 
 async function contestsFromApi(){
