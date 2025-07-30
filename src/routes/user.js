@@ -58,7 +58,7 @@ userRouter.post("/user/saveContests/:contestId",userAuth,async(req,res) => {
         
         const savedUser = await User.findOneAndUpdate({uid : uid},{
             $addToSet : { savedContests : contestDocument._id }
-        }).populate("savedContests",CONTEST_DATA)
+        },{new : true}).populate("savedContests",CONTEST_DATA)
         
         
         if(!savedUser || savedUser == {}) throw new Error("Please add the authorised User in DB")
@@ -81,8 +81,15 @@ userRouter.get("/user/registeredContests",userAuth,async(req,res) => {
         
         if(!uid || !req.user) throw new Error("Login to Continue")
         
-        const contestData = await User.findOne({uid :uid}).populate("savedContests",CONTEST_DATA)
+        const contestData = await User.findOne({uid :uid}).populate({
+            path: "savedContests",
+            match : {contestEndDate : {$gte : new Date()} },
+            options: { sort: { contestStartDate: 1 } }, 
+            select: CONTEST_DATA,
+        })
+
         console.log(contestData);
+        
         
         res.json({
             message : "🚀Contest saved Successfully for " + req.user.name,
@@ -91,6 +98,29 @@ userRouter.get("/user/registeredContests",userAuth,async(req,res) => {
     }catch(err){
         res.status(401).send(err)
     }
+})
+
+userRouter.delete("/user/deleteContests/:contestId",userAuth,async(req,res) => {
+    try {
+    const {uid} = req.user;
+    if(!uid) throw new Error("Please Login to continue")
+    const {contestId} = req.params
+    if(!contestId) throw new Error("Contest Doesnt Exist , Null contestId")
+    
+    const userWithFilteredContests = await User.findOneAndUpdate({uid : uid},{
+        $pull : {
+            savedContests : contestId
+        }},{
+            new : true
+        }
+    ).populate("savedContests",CONTEST_DATA)
+    res.json({
+        message : "Contest Unregistered Successfully",
+        data : userWithFilteredContests
+    })
+}catch(err){
+    console.log(err);
+}
 })
 
 module.exports = userRouter
