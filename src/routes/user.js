@@ -4,6 +4,8 @@ const User = require("../models/user")
 const userRouter = express.Router()
 const mongoose = require("mongoose")
 const Contest = require("../models/Contest")
+const agenda = require("../utils/agenda")
+
 
 // Save the user in Client as soon as authorised
 userRouter.get("/user",userAuth,async(req,res) => {
@@ -63,6 +65,19 @@ userRouter.post("/user/saveContests/:contestId",userAuth,async(req,res) => {
         
         if(!savedUser || savedUser == {}) throw new Error("Please add the authorised User in DB")
         
+             const reminderTime = new Date(new Date(contestDocument.contestStartDate).getTime() - 60 * 60 * 1000);
+             if (reminderTime > new Date()) {
+              await agenda.schedule('in 1 minute', "send contest reminder", {
+                userId: savedUser.uid,
+                email: savedUser.email,
+                contestId: contestDocument._id,
+                contestName: contestDocument.contestName,
+                contestUrl: contestDocument.contestUrl,
+                platform: contestDocument.platform,
+                hoursBefore : 1
+              });
+             }
+
         res.json({
             message : "🚀Contest saved Successfully for " + savedUser.name,
             data : savedUser
@@ -82,10 +97,11 @@ userRouter.get("/user/registeredContests",userAuth,async(req,res) => {
         if(!uid || !req.user) throw new Error("Login to Continue")
         
         const contestData = await User.findOne({uid :uid}).populate({
+            select: CONTEST_DATA,
             path: "savedContests",
             match : {contestEndDate : {$gte : new Date()} },
             options: { sort: { contestStartDate: 1 } }, 
-            select: CONTEST_DATA,
+            
         })
 
         console.log(contestData);
@@ -114,6 +130,14 @@ userRouter.delete("/user/deleteContests/:contestId",userAuth,async(req,res) => {
             new : true
         }
     ).populate("savedContests",CONTEST_DATA)
+
+    await agenda.cancel({
+        name: 'send contest reminder',
+        'data.userId': uid,
+        'data.contestId': contestId
+      });
+      
+
     res.json({
         message : "Contest Unregistered Successfully",
         data : userWithFilteredContests

@@ -3,6 +3,9 @@ const userAuth = require("../middlewares/auth")
 const Contest = require("../models/Contest")
 const contestsFromApi = require("../utils/contestsFromApi")
 const  mongoose = require("mongoose")
+const User = require("../models/user")
+const agenda = require("../utils/agenda")
+
 const contestRouter = express.Router()
 
 contestRouter.get("/contests/platform/:platform",async(req,res) => {
@@ -48,7 +51,7 @@ contestRouter.get("/contests/platform/:platform",async(req,res) => {
 contestRouter.get("/get-upcoming-contests/:platform",async(req,res) => {
     try {
         const {platform} = req.params
-    const response = await fetch("https://node.codolio.com/api/contest-calendar/v1/all/get-upcoming-contests")
+    const response = await fetch(process.env.UPCOMING_CONTESTS_API)
     const responseJSON = await response.json()
     
     for(const contest of responseJSON.data){

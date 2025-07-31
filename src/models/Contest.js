@@ -1,5 +1,5 @@
 const mongoose = require("mongoose")
-
+const validator = require('validator')
 
 const contestSchema = new mongoose.Schema({
     contestCode : {
@@ -48,7 +48,12 @@ const contestSchema = new mongoose.Schema({
     platform : {
         type : String,
         required : true
-    }
+    },
+    reminderScheduled: {
+        type: Boolean,
+        default: false
+      }
+      
 })
 
 const Contest = mongoose.model("Contest",contestSchema)
