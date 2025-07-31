@@ -67,7 +67,7 @@ userRouter.post("/user/saveContests/:contestId",userAuth,async(req,res) => {
         
              const reminderTime = new Date(new Date(contestDocument.contestStartDate).getTime() - 60 * 60 * 1000);
              if (reminderTime > new Date()) {
-              await agenda.schedule('in 1 minute', "send contest reminder", {
+              await agenda.schedule(reminderTime, "send contest reminder", {
                 userId: savedUser.uid,
                 email: savedUser.email,
                 contestId: contestDocument._id,

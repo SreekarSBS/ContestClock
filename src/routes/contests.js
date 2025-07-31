@@ -8,6 +8,48 @@ const agenda = require("../utils/agenda")
 
 const contestRouter = express.Router()
 
+contestRouter.get("/contests/platform/",async(req,res) => {
+    try{
+        const {startDate,endDate} = req.query
+        const {platforms} = req.query
+        
+        
+        const filteredPlatforms = platforms.split(",")
+
+       // Dont need to even call the api 
+
+        // Made a DB find based on the platform preferences
+                    
+        let contestsFromDB ;
+        
+        
+        if(filteredPlatforms.length > 0) contestsFromDB = await Contest.find({platform :{$in : filteredPlatforms}}).sort({contestStartDate : 1})
+        else contestsFromDB = await Contest.find({}).sort({contestStartDate : 1})
+
+        if(startDate) {
+            const start = new Date(startDate)
+            contestsFromDB = contestsFromDB.filter((item) => new Date(item.contestStartDate) >= start)
+        }
+        if(endDate) {
+            const end = new Date(endDate)
+            contestsFromDB = contestsFromDB.filter((item) => new Date(item.contestEndDate) <= end)
+        }
+
+        // Sorted the contests
+        //  contestsFromDB.sort((a, b) => new Date(a.contestStartDate) - new Date(b.contestStartDate));
+
+    
+        res.json({
+            message : "Contests Fetched Successfully",
+            data : contestsFromDB 
+        })
+
+
+    }catch(err){
+        res.status(401).send("Failed to fetch the contests : " + err)
+    }
+})
+
 contestRouter.get("/contests/platform/:platform",async(req,res) => {
     try{
         const {startDate,endDate} = req.query
