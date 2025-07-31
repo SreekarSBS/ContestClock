@@ -60,7 +60,13 @@ userRouter.post("/user/saveContests/:contestId",userAuth,async(req,res) => {
         
         const savedUser = await User.findOneAndUpdate({uid : uid},{
             $addToSet : { savedContests : contestDocument._id }
-        },{new : true}).populate("savedContests",CONTEST_DATA)
+        },{new : true}).populate({
+            select: CONTEST_DATA,
+            path: "savedContests",
+            match : {contestEndDate : {$gte : new Date()} },
+            options: { sort: { contestStartDate: 1 } }, 
+            
+        })
         
         
         if(!savedUser || savedUser == {}) throw new Error("Please add the authorised User in DB")
@@ -124,12 +130,18 @@ userRouter.delete("/user/deleteContests/:contestId",userAuth,async(req,res) => {
     if(!contestId) throw new Error("Contest Doesnt Exist , Null contestId")
     
     const userWithFilteredContests = await User.findOneAndUpdate({uid : uid},{
+        
         $pull : {
             savedContests : contestId
         }},{
             new : true
         }
-    ).populate("savedContests",CONTEST_DATA)
+    ).populate({
+        path: "savedContests",
+        match: { contestEndDate: { $gte: new Date() } },
+        select: CONTEST_DATA,
+        options: { sort: { contestStartDate: 1 } },
+      });
 
     await agenda.cancel({
         name: 'send contest reminder',
