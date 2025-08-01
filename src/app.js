@@ -21,9 +21,9 @@ defineSendReminderJob(agenda);
     console.error("Failed to start Agenda:", err);
   }
 })();
-const origins = ["https://contest-clock-ui.vercel.app", "http://localhost:3000"]
+
 app.use(cors({
-    origin : origins,
+    origin : "http://localhost:5173",
     credentials : true
 }))
 
