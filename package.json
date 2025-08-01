@@ -9,5 +9,25 @@
     "node-cron": "^4.2.1",
     "resend": "^4.7.0",
     "validator": "^13.15.15"
-  }
+  },
+  "name": "contesthub",
+  "version": "1.0.0",
+  "description": "",
+  "main": "app.js",
+  "devDependencies": {},
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start" : "node src/app.js",
+    "dev": "nodemon src/app.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/SreekarSBS/ContestClock.git"
+  },
+  "author": "SreekarSBS",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/SreekarSBS/ContestClock/issues"
+  },
+  "homepage": "https://github.com/SreekarSBS/ContestClock#readme"
 }

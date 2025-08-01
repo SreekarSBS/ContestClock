@@ -1,11 +1,11 @@
 require("dotenv").config()
 const express = require("express")
 const cors = require("cors")
-const ConnectDB = require("./src/config/database")
-const contestRouter = require("./src/routes/contests")
-const userRouter = require("./src/routes/user")
-const agenda = require("./src/utils/agenda")
-const defineSendReminderJob = require("./src/utils/sendMail")
+const ConnectDB = require("./config/database")
+const contestRouter = require("./routes/contests")
+const userRouter = require("./routes/user")
+const agenda = require("./utils/agenda")
+const defineSendReminderJob = require("./utils/sendMail")
 
 
 const app = express()
@@ -26,7 +26,7 @@ app.use(cors({
     credentials : true
 }))
 
-require("./src/utils/cronjob")
+require("./utils/cronjob")
 
 app.use("/",contestRouter)
 app.use("/",userRouter)
