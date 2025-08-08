@@ -17,7 +17,7 @@ contestRouter.get("/contests/platform/",async(req,res) => {
         const filteredPlatforms = platforms.split(",")
 
        // Dont need to even call the api 
-
+       
         // Made a DB find based on the platform preferences
                     
         let contestsFromDB ;
@@ -93,13 +93,7 @@ contestRouter.get("/contests/platform/:platform",async(req,res) => {
 contestRouter.get("/get-upcoming-contests/:platform",async(req,res) => {
     try {
         const {platform} = req.params
-    const response = await fetch(process.env.UPCOMING_CONTESTS_API)
-    const responseJSON = await response.json()
-    
-    for(const contest of responseJSON.data){
-        const {contestCode} = contest
-        await Contest.findOneAndUpdate({contestCode},contest,{upsert : true,new : true})
-    }
+   
     let contestsFromDB;
     if(platform !== "all") contestsFromDB = await Contest.find({platform : platform}).sort({contestStartDate :1})
         else contestsFromDB = await Contest.find({}).sort({contestStartDate :1})
