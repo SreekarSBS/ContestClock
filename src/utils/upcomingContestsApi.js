@@ -6,8 +6,34 @@ const fetchUpcomingContests = async () => {
         const responseJSON = await response.json()
         
         for(const contest of responseJSON.data){
-            const {contestCode} = contest
-            await Contest.findOneAndUpdate({contestCode},contest,{upsert : true,new : true})
+            const {
+                contestCode,
+                contestDuration,
+                contestEndDate,
+                contestName,
+                contestRegistrationEndDate,
+                contestRegistrationStartDate,
+                contestSlug,
+                contestStartDate,
+                contestType,
+                contestUrl,
+                platform
+            } = contest;
+        
+            const updateData = {
+                contestDuration,
+                contestEndDate,
+                contestName,
+                contestRegistrationEndDate,
+                contestRegistrationStartDate,
+                contestSlug,
+                contestStartDate,
+                contestType,
+                contestUrl,
+                platform
+            };
+        
+            await Contest.findOneAndUpdate({contestCode},{ $set : updateData},{upsert : true,new : true})
         }
         console.log("Upcoming contests fetched and updated successfully.");
         
