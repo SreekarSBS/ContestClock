@@ -8,7 +8,7 @@ const defineSendReminderJob = (agenda) => {
     console.log(`🚀 Sending reminder to ${email} for ${contestName}`);
     try {
       await resend.emails.send({
-        from: 'onboarding@resend.dev',
+        from: 'reminders@contestclock.live',
         to: email,
         subject: `⏰ ${contestName} starts in ${hoursBefore} hour(s)!`,
         html: `<div>
